@@ -28,10 +28,10 @@ export const registerUser = async (req, res, next) => {
       hashedPassword,
     );
 
-    const otp = await generateotp();
+    const otp = await generateOtp();
     const hashedOtp = await bcrypt.hash(otp.toString(), 10);
     const html = await getOtpHtml(otp);
-    await userServices.createotp(email, userId.id, hashedOtp);
+    await userServices.createOtp(email, userId.id, hashedOtp);
     await sendEmail(email, "Verify your email", "Verify your email", html);
     
     res.status(200).json({
