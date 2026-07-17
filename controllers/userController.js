@@ -33,7 +33,7 @@ export const registerUser = async (req, res, next) => {
     const html = await getOtpHtml(otp);
     await userServices.createOtp(email, userId.id, hashedOtp);
     await sendEmail(email, "Verify your email", "Verify your email", html);
-    
+
     res.status(200).json({
       status: true,
       message: "User created successfully",
@@ -41,7 +41,7 @@ export const registerUser = async (req, res, next) => {
         id: userId.id,
         username: userId.username,
         email: userId.email,
-        verified: userId.verified
+        verified: userId.verified,
       },
     });
   } catch (err) {
@@ -50,16 +50,17 @@ export const registerUser = async (req, res, next) => {
 };
 
 export const getMe = async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
-  if (!token)
-    return res.status(401).json({ status: false, message: "Unauthorized" });
   try {
-    const decodedToken = verifyToken(token);
-    console.log(decodedToken);
-    const user = await userServices.findUserById(decodedToken.id);
+    const user = await userServices.findUserById(req.user.id);
     res.status(200).json({
       status: true,
-      user: user,
+      message: "User found successfully",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        verified: user.verified,
+      },
     });
   } catch (err) {
     next(err);
@@ -80,7 +81,7 @@ export const logIn = async (req, res, next) => {
         .status(401)
         .json({ status: false, message: "Email or Password is invalid" });
     }
-    if(!user.verified) {
+    if (!user.verified) {
       return res
         .status(401)
         .json({ status: false, message: "Please verify your email" });
@@ -121,13 +122,9 @@ export const logIn = async (req, res, next) => {
 };
 
 export const refreshToken = async (req, res, next) => {
-  const refreshToken = req.cookies.refreshtoken;
-  if (!refreshToken) {
-    return res.status(401).json({ status: false, message: "Unauthorized" });
-  }
   try {
-    const decodedToken = await verifyToken(refreshToken);
-    const userId = decodedToken.id;
+    const userId = req.user.id;
+    const refreshToken = req.refreshToken;
     const activeSessions = await userServices.getSessionsByUserID(userId);
     let isValidSession = false;
     for (const session of activeSessions) {
@@ -150,25 +147,15 @@ export const refreshToken = async (req, res, next) => {
       status: true,
       token: accessToken,
     });
-  } catch (err) {
-    res.clearCookie("refreshtoken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
+  } catch(err){
     next(err);
   }
 };
 
 export const logOut = async (req, res, next) => {
-  const refreshToken = req.cookies.refreshtoken;
-  if (!refreshToken) {
-    return res.status(401).json({ status: false, message: "Unauthorized" });
-  }
   try {
-    const decodedToken = await verifyToken(refreshToken);
-    const userId = decodedToken.id;
-
+    const userId = req.user.id;
+    const refreshToken = req.refreshToken;
     const userSessions = await userServices.getSessionsByUserID(userId);
 
     let matchedSessionId = null;
@@ -203,13 +190,9 @@ export const logOut = async (req, res, next) => {
 };
 
 export const logoutAll = async (req, res, next) => {
-  const refreshToken = req.cookies.refreshtoken;
-  if (!refreshToken) {
-    return res.status(401).json({ status: false, message: "Unauthorized" });
-  }
   try {
-    const decodedToken = await verifyToken(refreshToken);
-    const userId = decodedToken.id;
+    const userId = req.user.id;
+    const refreshToken = req.refreshToken;
     // Finding/Get all sessions by user id
     const userSessions = await userServices.getSessionsByUserID(userId);
     let currentSessionId = null;
@@ -236,46 +219,51 @@ export const logoutAll = async (req, res, next) => {
 };
 
 export const verifyEmail = async (req, res, next) => {
-    const {otp, email} = req.body;
-    try{
-      const findEmail = await userServices.getOtpByEmail(email);
-      if(!findEmail){
-        return res.status(400).json({status: false, message: "Email not found"});
-      }
-      const isMatch = await bcrypt.compare(otp.toString(), findEmail.otp_hash);
-      if(!isMatch){
-        return res.status(400).json({status: false, message: "Invalid OTP"});
-      }
-      const user = await userServices.findUserByEmail(email);
-      if(!user){
-        return res.status(400).json({status: false, message: "User not found"});
-      }
-      await userServices.updateVerified(user.id);
-      const accessToken = await generateToken(user.id, "15m");
-      const refreshToken = await generateToken(user.id);
-      const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-      //delete otp all by user email
-      await userServices.deleteOtpByEmail(email);
-      const session = await userServices.createSession(user.id, hashedRefreshToken, req.ip, req.headers["user-agent"]);
-      res.cookie("refreshtoken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: 24 * 60 * 60 * 1000,
-      })
-      res.status(200).json({
-        status: true,
-        token: accessToken,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          verified: user.verified
-        },
-      });
+  const { otp, email } = req.body;
+  try {
+    const findEmail = await userServices.getOtpByEmail(email);
+    if (!findEmail) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Email not found" });
     }
-    catch(err){
-      next(err);
+    const isMatch = await bcrypt.compare(otp.toString(), findEmail.otp_hash);
+    if (!isMatch) {
+      return res.status(400).json({ status: false, message: "Invalid OTP" });
     }
-
-}
+    const user = await userServices.findUserByEmail(email);
+    if (!user) {
+      return res.status(400).json({ status: false, message: "User not found" });
+    }
+    await userServices.updateVerified(user.id);
+    const accessToken = await generateToken(user.id, "15m");
+    const refreshToken = await generateToken(user.id);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    //delete otp all by user email
+    await userServices.deleteOtpByEmail(email);
+    const session = await userServices.createSession(
+      user.id,
+      hashedRefreshToken,
+      req.ip,
+      req.headers["user-agent"],
+    );
+    res.cookie("refreshtoken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.status(200).json({
+      status: true,
+      token: accessToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        verified: user.verified,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

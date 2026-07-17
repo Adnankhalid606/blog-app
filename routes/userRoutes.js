@@ -8,16 +8,14 @@ import {
   registerUser,
   verifyEmail,
 } from "../controllers/userController.js";
+import { protect, protectRefresh } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/verify-email", verifyEmail);
 router.post("/login", logIn);
-router.post("/logout", logOut);
-router.post("/logout-all", logoutAll);
-/*
- *Temporay Get Me
- */
-router.get("/getme", getMe);
-router.get("/refresh-token", refreshToken);
+router.post("/logout", protectRefresh , logOut);
+router.post("/logout-all", protect, logoutAll);
+router.get("/getme", protect, getMe);
+router.get("/refresh-token", protectRefresh, refreshToken);
 export default router;

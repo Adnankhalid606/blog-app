@@ -2,7 +2,7 @@ import db from "../config/dbConnection.js";
 
 export const createUser = async (username, email, password) => {
   const [result] = await db.query(
-    "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+    "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')",
     [username, email, password],
   );
   const userID = result.insertId;
