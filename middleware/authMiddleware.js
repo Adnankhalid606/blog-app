@@ -1,3 +1,4 @@
+import { findUserById } from "../services/userServices.js";
 import verifyToken from "../utils/verifyToken.js";
 
 export const protect = async (req, res, next) => {
@@ -8,7 +9,8 @@ export const protect = async (req, res, next) => {
     }
     const token = authHeader.split(" ")[1];
     const decoded = await verifyToken(token);
-    req.user = decoded;
+    const user = await findUserById(decoded.id);
+    req.user = user;
     next();
     }
     catch(err){
@@ -23,7 +25,8 @@ export const protectRefresh = async (req, res, next)=>{
         return res.status(401).json({status: false, message: "Unauthorized"});
     }
     const decoded = await verifyToken(refreshToken);
-    req.user = decoded;
+    const user = await findUserById(decoded.id);
+    req.user = user;
     req.refreshToken = refreshToken;
     next();
     }
@@ -31,3 +34,13 @@ export const protectRefresh = async (req, res, next)=>{
         next(err);
     }
 }
+
+export const allowRoles = (...roles)=>{
+    return (req, res, next)=>{
+        console.log(req.user.role);
+        if(!roles.includes(req.user.role)){
+            return res.status(403).json({status: false, message: "Forbidden"});
+        }
+        next();
+    }
+};

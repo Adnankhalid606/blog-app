@@ -49,7 +49,7 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
-export const getMe = async (req, res, next) => {
+export const me = async (req, res, next) => {
   try {
     const user = await userServices.findUserById(req.user.id);
     res.status(200).json({
