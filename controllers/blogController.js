@@ -73,7 +73,8 @@ export const updateBlog = async (req, res, next) => {
     });
   }
   try {
-    const updateBlog = await blogService.updateBlog(id, title, content);
+    let status = req.user.role === "admin" ? "published" : "draft";
+    const updateBlog = await blogService.updateBlog(id, title, content, status);
     res.status(200).json({
       status: true,
       message: "Blog Updated Successfully",
@@ -109,24 +110,23 @@ export const publishBlog = async (req, res, next) => {
 
 //Get Blog By Author All Blogs even Pending, Draft etc
 export const blogsByAuthor = async (req, res, next) => {
-  try{
-      const authorId = req.user.id;
-      const blogs = await blogService.getBlogsByAuthor(authorId);
-      if(blogs.length === 0){
-        return res.status(404).json({
-          status: true,
-          message: "No Blogs Found",
-          blogs: blogs,
-        });
-      }
-      res.status(200).json({
+  try {
+    const authorId = req.user.id;
+    const blogs = await blogService.getBlogsByAuthor(authorId);
+    if (blogs.length === 0) {
+      return res.status(404).json({
         status: true,
+        message: "No Blogs Found",
         blogs: blogs,
       });
     }
-    catch(err){
-      next(err);
-    }
+    res.status(200).json({
+      status: true,
+      blogs: blogs,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 //DELETE NOTE
