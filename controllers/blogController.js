@@ -2,6 +2,9 @@ import * as blogService from "../services/blogService.js";
 //GET ALL BLOG
 export const getAllBlogs = async (req, res, next) => {
   try {
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10,1), 50);
+    const offset = (page - 1) * limit;
     const allBlogs = await blogService.getAllBlogs();
     if (allBlogs.length === 0) {
       return res.status(200).json({
@@ -43,7 +46,9 @@ export const getBlogById = async (req, res, next) => {
 //POST OR CREATE A BLOG
 export const createBlog = async (req, res, next) => {
   const { title, content } = req.body;
+  const image = req.file?.filename;
   const authorId = req.user.id;
+  let status = req.user.role === "admin" ? "published" : "draft";
   if (!title || !content) {
     return res.status(400).json({
       status: false,
@@ -51,7 +56,13 @@ export const createBlog = async (req, res, next) => {
     });
   }
   try {
-    const newBlog = await blogService.createBlog(title, content, authorId);
+    const newBlog = await blogService.createBlog(
+      title,
+      content,
+      authorId,
+      image,
+      status
+    );
     res.status(200).json({
       status: true,
       message: "Blog Created Successfully",

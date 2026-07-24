@@ -15,10 +15,10 @@ export const transporter = nodemailer.createTransport({
 });
 
 transporter.verify((error, success, next) => {
-  if (error) {
-    next(error);
-  } else {
-    console.log("Email sever is ready to send messages");
+  if(success){
+    console.log("Server is ready to take our messages");
+  }else{
+    console.log(error);
   }
 });
 

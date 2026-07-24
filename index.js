@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan"
 import cookieParser from "cookie-parser";
+import path from 'path';
 import blogRoutes from "./routes/blogRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import adminRoutes from './routes/adminRoutes.js'
@@ -11,6 +12,7 @@ const PORT = 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
+app.use('/uploads',express.static(path.join("uploads")));
 
 app.use('/api/blogs', blogRoutes);
 app.use('/api/user', userRoutes);

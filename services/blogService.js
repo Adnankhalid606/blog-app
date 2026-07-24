@@ -1,7 +1,7 @@
 import db from "../config/dbConnection.js";
 
 //GET ALL BLOGS
-export const getAllBlogs = async () => {
+export const getAllBlogs = async (limit, offset) => {
   const [rows] = await db.query(
     "SELECT * FROM blogs WHERE status = 'published'",
   );
@@ -24,10 +24,10 @@ export const getPublishedBlogByID = async (id) => {
 
 //CREATE A BLOG
 
-export const createBlog = async (title, content, authorId) => {
+export const createBlog = async (title, content, authorId, image, status) => {
   const [result] = await db.query(
-    "INSERT INTO blogs (author_id, title, content, status) VALUES (?, ?, ?, 'draft')",
-    [authorId, title, content],
+    "INSERT INTO blogs (author_id, title, content, image, status) VALUES (?, ?, ?, ?, ?)",
+    [authorId, title, content, image, status],
   );
   const id = result.insertId;
   const [rows] = await db.query("SELECT * FROM blogs WHERE id = ?", [id]);
