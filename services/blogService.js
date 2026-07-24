@@ -1,11 +1,72 @@
 import db from "../config/dbConnection.js";
 
 //GET ALL BLOGS
-export const getAllBlogs = async (limit, offset) => {
-  const [rows] = await db.query(
-    "SELECT * FROM blogs WHERE status = 'published'",
+export const getAllBlogs = async (
+  limit,
+  offset,
+  search,
+  category
+) => {
+
+  let query = `
+    SELECT *
+    FROM blogs
+    WHERE status = 'published'
+  `;
+
+  const values = [];
+
+  // Search
+  if (search) {
+    query += " AND title LIKE ?";
+    values.push(`%${search}%`);
+  }
+
+  // Category Filter
+  if (category) {
+    query += " AND category = ?";
+    values.push(category);
+  }
+
+  query += `
+    ORDER BY created_at DESC
+    LIMIT ?
+    OFFSET ?
+  `;
+
+  values.push(limit);
+  values.push(offset);
+
+  const [blogs] = await db.query(query, values);
+
+
+  let countQuery = `
+    SELECT COUNT(*) AS totalBlogs
+    FROM blogs
+    WHERE status = 'published'
+  `;
+
+  const countValues = [];
+
+  if (search) {
+    countQuery += " AND title LIKE ?";
+    countValues.push(`%${search}%`);
+  }
+
+  if (category) {
+    countQuery += " AND category = ?";
+    countValues.push(category);
+  }
+
+  const [[countResult]] = await db.query(
+    countQuery,
+    countValues
   );
-  return rows;
+
+  return {
+    blogs,
+    totalBlogs: countResult.totalBlogs,
+  };
 };
 
 //GET BLOG BY ID

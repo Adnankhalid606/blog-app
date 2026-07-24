@@ -5,17 +5,23 @@ export const getAllBlogs = async (req, res, next) => {
     const page = Math.max(Number(req.query.page) || 1, 1);
     const limit = Math.min(Math.max(Number(req.query.limit) || 10,1), 50);
     const offset = (page - 1) * limit;
-    const allBlogs = await blogService.getAllBlogs();
-    if (allBlogs.length === 0) {
+    const search = req.query.search || "";
+    const {blogs, totalBlogs} = await blogService.getAllBlogs(limit, offset, search);
+    if (blogs.length === 0) {
       return res.status(200).json({
         status: true,
         message: "No Blogs Found",
-        blogs: allBlogs,
+        blogs: blogs,
       });
     }
+    const totalPages = Math.ceil(totalBlogs/limit);
     res.status(200).json({
       status: true,
-      Blogs: allBlogs,
+      page,
+      limit,
+      totalBlogs,
+      totalPages,
+      blogs
     });
   } catch (err) {
     next(err);
