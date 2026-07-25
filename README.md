@@ -20,14 +20,6 @@ A backend blog application built with Node.js, Express.js and MySQL.
 - Environment Variables
 - Global Error Handling
 
-## Upcoming
-
-### User Features
-- User Profile
-- Edit Profile
-- Bookmark Blogs
-- Like/Unlike Blogs
-- Comment on Blogs
 
 ### Author Features
 - Draft Blogs
@@ -43,6 +35,17 @@ A backend blog application built with Node.js, Express.js and MySQL.
 - Manage Blogs
 - Manage Categories
 - Manage Tags
+
+## Upcoming
+
+### User Features
+- User Profile
+- Edit Profile
+- Bookmark Blogs
+- Like/Unlike Blogs
+- Comment on Blogs
+
+### Admin Features
 - Dashboard Analytics
 
 ### Blog Features
