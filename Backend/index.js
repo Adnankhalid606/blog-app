@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan"
 import cookieParser from "cookie-parser";
 import path from 'path';
+import cors from "cors";
 import blogRoutes from "./routes/blogRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import adminRoutes from './routes/adminRoutes.js'
@@ -13,6 +14,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use('/uploads',express.static(path.join("uploads")));
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 
 app.use('/api/blogs', blogRoutes);
 app.use('/api/user', userRoutes);
