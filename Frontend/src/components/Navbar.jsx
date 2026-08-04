@@ -1,88 +1,57 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-
 function Navbar() {
   const { user, logout, loading } = useAuth();
-  if(loading){
-    return <p>Loading.... </p>
-  }
-  const NavLinks = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "Blog",
-      path: "/blogs",
-    },
-    {
-      name: "About",
-      path: "/about",
-    },
-    {
-      name: "Contact",
-      path: "/contact",
-    },
-  ];
+  const navigate = useNavigate();
+  const signOut = async () => {
+    try {
+      await logout();
+    } finally {
+      navigate("/");
+    }
+  };
+  if (loading)
+    return (
+      <div className="h-16">
+        <span className="loader" />
+      </div>
+    );
   return (
-    <nav className="p-5">
-      <div className="flex justify-between max-w-7xl mx-auto">
-        <div>
-          <h1 className="text-2xl">Logo Here</h1>
-        </div>
-
-        <div className="flex gap-5">
-          <div className="flex gap-4 items-center">
-            {NavLinks.map((link) => {
-              return (
-                <NavLink
-                  to={link.path}
-                  className={({ isActive }) =>
-                    `hover:text-blue-500 ${isActive ? "text-blue-500" : "text-black"}`
-                  }
-                  key={link.path}
-                >
-                  {link.name}
-                </NavLink>
-              );
-            })}
-          </div>
-          <div className="flex gap-4 items-center">
-            {user ? (
-              <>
-                <p className="flex flex-col">
-                  <span className="font-bold">{user?.username}</span>
-                  <span>{user?.role}</span>
-                </p>
-                <button
-                  onClick={logout}
-                  className="border rounded border-gray-300 py-2 px-5 shadow-sm hover:border-gray-500 cursor-pointer transition-colors duration-300"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <NavLink
-                  to={"/login"}
-                  className="border rounded border-gray-300 py-2 px-5 shadow-sm hover:border-gray-500 cursor-pointer transition-colors duration-300"
-                >
-                  Login
-                </NavLink>
-                <NavLink
-                  to={"/register"}
-                  className="border rounded bg-black text-white py-2 px-5 shadow-sm hover:bg-gray-800 cursor-pointer transition-colors duration-300"
-                >
-                  Sign up
-                </NavLink>
-              </>
-            )}
-          </div>
+    <nav className="border-b border-gray-200 bg-white px-5 py-4">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
+        <NavLink to="/" className="text-xl font-bold">
+          BlogSpace
+        </NavLink>
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <NavLink to="/">Home</NavLink>
+          {user && (
+            <>
+              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/profile">Profile</NavLink>
+              {["author", "admin"].includes(user.role) && (
+                <NavLink to="/my-blogs">My blogs</NavLink>
+              )}
+              {user.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
+            </>
+          )}
+          {user ? (
+            <button onClick={signOut} className="rounded border px-3 py-1">
+              Logout
+            </button>
+          ) : (
+            <>
+              <NavLink to="/login">Login</NavLink>
+              <NavLink
+                to="/register"
+                className="rounded bg-black px-3 py-1 text-white"
+              >
+                Sign up
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </nav>
   );
 }
-
 export default Navbar;

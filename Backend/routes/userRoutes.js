@@ -1,21 +1,14 @@
 import express from "express";
-import {
-  me,
-  logIn,
-  logOut,
-  logoutAll,
-  refreshToken,
-  registerUser,
-  verifyEmail,
-} from "../controllers/userController.js";
-import { allowRoles, protect, protectRefresh } from "../middleware/authMiddleware.js";
-import * as adminController from "../controllers/adminController.js";
+import { me, logIn, logOut, logoutAll, refreshToken, registerUser, verifyEmail, resendVerificationEmail, requestPasswordReset, resetPassword } from "../controllers/userController.js";
+import { protect, protectRefresh } from "../middleware/authMiddleware.js";
 const router = express.Router();
-
 router.post("/register", registerUser);
 router.post("/verify-email", verifyEmail);
+router.post("/resend-verification", resendVerificationEmail);
+router.post("/forgot-password", requestPasswordReset);
+router.post("/reset-password", resetPassword);
 router.post("/login", logIn);
-router.post("/logout", protectRefresh , logOut);
+router.post("/logout", protectRefresh, logOut);
 router.post("/logout-all", protectRefresh, logoutAll);
 router.get("/me", protect, me);
 router.post("/refresh-token", protectRefresh, refreshToken);

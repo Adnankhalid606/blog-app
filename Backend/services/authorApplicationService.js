@@ -7,7 +7,7 @@ export const createAuthorRequest = async (userId, reason) => {
   return result.insertId;
 };
 export const getAllRequests = async () => {
-  const [result] = await db.query("SELECT * FROM author_requests");
+  const [result] = await db.query("SELECT author_requests.*, users.username AS user_name, users.email AS user_email FROM author_requests JOIN users ON users.id = author_requests.user_id");
   return result;
 };
 export const findPendingRequestByUserId = async (userId) => {
@@ -26,7 +26,7 @@ export const cancelAuthorRequestById = async (id) => {
 };
 export const getAllPendingRequests = async () => {
   const [result] = await db.query(
-    "SELECT * FROM author_requests WHERE status = 'pending'",
+    "SELECT author_requests.*, users.username AS user_name, users.email AS user_email FROM author_requests JOIN users ON users.id = author_requests.user_id WHERE author_requests.status = 'pending'",
   );
   return result;
 };

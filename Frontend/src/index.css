@@ -1,11 +1,34 @@
 @import "tailwindcss";
-*{
-   font-family: "Montserrat", sans-serif;
+* {
+  font-family: "Montserrat", sans-serif;
+}
+.markdown-content h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.75rem;
+}
+.markdown-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.5rem;
+}
+.markdown-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+}
+.markdown-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+.markdown-content code {
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.25rem;
 }
 .loader {
-  --color-1: #000000;
+  --color-1: #000;
   --size: 1px;
-
   width: calc(8 * var(--size));
   height: calc(40 * var(--size));
   border-radius: calc(4 * var(--size));
@@ -14,13 +37,11 @@
   position: relative;
   background: currentColor;
   color: var(--color-1);
-  box-sizing: border-box;
   animation: animloader 0.3s 0.3s linear infinite alternate;
 }
-
 .loader::after,
 .loader::before {
-  content: '';
+  content: "";
   width: calc(8 * var(--size));
   height: calc(40 * var(--size));
   border-radius: calc(4 * var(--size));
@@ -29,14 +50,12 @@
   top: 50%;
   transform: translateY(-50%);
   left: calc(20 * var(--size));
-  box-sizing: border-box;
   animation: animloader 0.3s 0.45s linear infinite alternate;
 }
 .loader::before {
   left: calc(-20 * var(--size));
   animation-delay: 0s;
 }
-
 @keyframes animloader {
   0% {
     height: calc(48 * var(--size));

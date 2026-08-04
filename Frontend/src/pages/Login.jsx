@@ -4,54 +4,49 @@ import { loginUser } from "../services/authService";
 import { useAuth } from "../hooks/useAuth";
 import { setToken } from "../services/tokenService";
 
-
-export default function Login() {
+function Login() {
   const navigate = useNavigate();
-  const {login} = useAuth();
-  const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    setError(null);
-    setFormData(prev => ({
-    ...prev,
-    [e.target.name]: e.target.value,
-}));
+  const { login } = useAuth();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const handleChange = (event) => {
+    setError("");
+    setFormData((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }));
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
     try {
-      const { email, password } = formData;
-      const res = await loginUser(email, password);
-      setToken(res.data.token);
-      login(res.data.user);
+      const response = await loginUser(formData.email, formData.password);
+      setToken(response.data.token);
+      login(response.data.user);
       navigate("/");
-      setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      const message = err.response?.data?.message || err.message;
+      if (message.toLowerCase().includes("verify your email")) {
+        navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+        return;
+      }
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
-    <>
-      <div className="w-full lg:w-1/3 mx-auto mt-30 border border-gray-200 shadow rounded-2xl">
-        <h1 className="text-center text-3xl font-semibold mt-7">
+    <main className="px-5 py-10">
+      <div className="mx-auto max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+        <h1 className="text-center text-3xl font-semibold">
           Sign in to your account
         </h1>
-
-        <div className="w-full h-full p-12  ">
-          <form
-            action=""
-            method="POST"
-            className="space-y-6"
-            onSubmit={handleSubmit}
-          >
+        <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+          <div>
             <label
               htmlFor="email"
-              className="block text-sm/6 font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium text-gray-700"
             >
               Email address
             </label>
@@ -62,12 +57,14 @@ export default function Login() {
               required
               autoComplete="email"
               value={formData.email}
-              className="block w-full rounded-md border-gray-300 shadow-sm px-3 py-1.5 text-base font-normal hover:shadow-md focus:shadow-md focus:border-gray-800 "
               onChange={handleChange}
+              className="block w-full rounded border border-gray-300 px-3 py-2"
             />
+          </div>
+          <div>
             <label
               htmlFor="password"
-              className="block text-sm/6 font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium text-gray-700"
             >
               Password
             </label>
@@ -77,34 +74,36 @@ export default function Login() {
               id="password"
               required
               value={formData.password}
-              className="block w-full rounded-md border-gray-300 shadow-sm px-3 py-1.5 text-base font-normal hover:shadow-md focus:shadow-md focus:border-gray-800 "
               onChange={handleChange}
+              className="block w-full rounded border border-gray-300 px-3 py-2"
             />
-            <div className="text-red-800 ">{
-              error && <p>{error}</p>
-              }</div>
-            <div className="flex items-center justify-center">
-              <p>
-                Don't have an Account?
-                <Link
-                  to="/register"
-                  className="cursor-pointer underline hover:font-bold"
-                >
-                  Register here
-                </Link>
-              </p>
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md border px-3 py-2 font-semibold text-white bg-black hover:bg-gray-800 cursor-pointer"
-              >
-                Sign in
-              </button>
-            </div>
-          </form>
-        </div>
+          </div>
+          {error && (
+            <p className="rounded bg-red-50 p-3 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          <p className="text-right text-sm">
+            <Link to="/forgot-password" className="underline">
+              Forgot password?
+            </Link>
+          </p>
+          <p className="text-center text-sm">
+            Don't have an account?{" "}
+            <Link to="/register" className="underline">
+              Register here
+            </Link>
+          </p>
+          <button
+            disabled={loading}
+            type="submit"
+            className="flex w-full justify-center rounded bg-black px-3 py-2 font-semibold text-white disabled:opacity-50"
+          >
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
       </div>
-    </>
+    </main>
   );
 }
+export default Login;

@@ -1,11 +1,11 @@
 import api from "./api";
 
-export async function getAllBlogs(){
-    try{return api.get("/blogs");}
-    catch (err){
-        console.log(err);
-    }
+export function getAllBlogs({ page = 1, limit = 10, search = "" } = {}) {
+  return api.get("/blogs", { params: { page, limit, search } });
 }
-export async function getBlogById(id){
-    return api.get(`/blogs/${id}`);
-}
+export const getBlogById = (id) => api.get(`/blogs/${id}`);
+export const createBlog = (formData) => api.post("/blogs/create", formData);
+export const updateBlog = (id, data) => api.put(`/blogs/${id}`, data);
+export const deleteBlog = (id) => api.delete(`/blogs/${id}`);
+export const getMyBlogs = () => api.get("/blogs/me");
+export const submitBlog = (id) => api.patch(`/blogs/${id}/publish`);

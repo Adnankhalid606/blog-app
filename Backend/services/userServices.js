@@ -75,3 +75,11 @@ export const createOtp = async (email, user_id, otp_hash) => {
   );
   return result;
 };
+
+export const updatePassword = async (id, password) => {
+  const [result] = await db.query(
+    "UPDATE users SET password = ? WHERE id = ?",
+    [password, id],
+  );
+  return result;
+};

@@ -14,26 +14,20 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
-transporter.verify((error, success, next) => {
-  if(success){
-    console.log("Server is ready to take our messages");
-  }else{
-    console.log(error);
-  }
+transporter.verify((error) => {
+  if (error) console.error("Email service is not ready:", error.message);
+  else console.log("Email service is ready");
 });
 
-export const sendEmail = async (to, subject, text, html, next) => {
-  try {
-    const info = await transporter.sendMail({
-      from: `"Your Name" <${process.env.GOOGLE_USER}>`,
-      to,
-      subject,
-      text,
-      html,
-    });
-    console.log("Message sent: %s", info.messageId);
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  } catch (err) {
-    next(err);
-  }
+export const sendEmail = async (to, subject, text, html) => {
+  const info = await transporter.sendMail({
+    from: `"BlogSpace" <${process.env.GOOGLE_USER}>`,
+    to,
+    subject,
+    text,
+    html,
+  });
+
+  console.log("Message sent: %s", info.messageId);
+  return info;
 };
