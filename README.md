@@ -1,8 +1,8 @@
 # Blog Application
 
-A full-stack blog application built with React, Node.js, Express, and MySQL. It includes authentication, role-based access, blog review, and image uploads.
+A full-stack blog management system built with React, Node.js, Express, and MySQL.
 
-This project was built as a learning project with a focus on clear folder structure, reusable frontend components, and a simple REST API.
+The project was developed as a portfolio and learning project to practice full-stack application development using a modern React frontend and a RESTful Express backend. It includes authentication, role-based authorization, blog moderation, image uploads, Markdown support, and a structured MVC architecture.
 
 ## Features
 
@@ -97,6 +97,11 @@ npm run dev
 
 Rename `.env.example` to `.env` and update with your MySQL and SMTP credentials.
 
+Configure:
+- Database credentials
+- JWT Secret
+- SMTP credentials
+
 ### 3. Set up the frontend
 
 Open a second terminal:
@@ -124,18 +129,31 @@ The frontend runs on `http://localhost:5173` by default. The backend is set up t
 | Author applications | `/api/author/application` |
 | Admin review | `/api/admin/blogs/pending` |
 
-## Blog Status Flow
+## Blog Workflow
 
 ```text
-Draft ? Pending review ? Published
-                    +? Rejected
+Draft
+   │
+   ▼
+Pending Review
+   │
+   ├── Approved ──► Published
+   │
+   └── Rejected
 ```
 
 Authors create drafts and submit them for review. Admins approve or reject pending submissions.
 
 ## Markdown Support
 
-Blog content supports basic Markdown:
+Supported syntax includes:
+
+- Headings
+- Bold
+- Italic
+- Code blocks
+- Links
+- List
 
 ```md
 # Heading
@@ -163,7 +181,37 @@ npm run dev      # Start the Express server with nodemon
 
 ## Current Limitations
 
-The current backend does not yet provide endpoints for bookmarks, profile updates, filtering, or sorting. These features are not shown in the frontend until the API supports them. This project is work on only LocalHost Envirmonent as it is a learning project. For deploy it you need to change somethings. (Will drop a guide for that soon)
+The current backend does not yet provide endpoints for bookmarks, profile updates, filtering, or sorting. These features are not shown in the frontend until the API supports them. This project is work on only LocalHost Envirmonent as it is a learning project. For deploy it you need to change somethings. (Will drop a guide for that soon).
+
+## Roadmap
+
+Planned Improvements:
+
+- Bookmarking
+- Likes
+- Sorting
+- Advance Filtering
+- User Profile Management
+- Deployment Guide
+
+## Learning Highlights
+
+This helped me Practice
+
+- Rest API Development
+- MVC Architecture
+- JWT Authentication
+- Role-Based Access Control (RBAC)
+- Middleware
+- File Uploads with multer
+- MySQL Integration
+- Error Handling
+- Node.js Backend
+
+## License
+
+This project is intended for educational and portfolio purposes.
+
 ## Author
 
 Adnan Khalid
