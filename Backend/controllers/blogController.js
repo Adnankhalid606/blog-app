@@ -1,12 +1,19 @@
 import * as blogService from "../services/blogService.js";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
+import { deleteFromCloudinary } from "../utils/cloudinaryDelete.js";
+
 //GET ALL BLOG
 export const getAllBlogs = async (req, res, next) => {
   try {
     const page = Math.max(Number(req.query.page) || 1, 1);
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10,1), 50);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 50);
     const offset = (page - 1) * limit;
     const search = req.query.search || "";
-    const {blogs, totalBlogs} = await blogService.getAllBlogs(limit, offset, search);
+    const { blogs, totalBlogs } = await blogService.getAllBlogs(
+      limit,
+      offset,
+      search,
+    );
     if (blogs.length === 0) {
       return res.status(200).json({
         status: true,
@@ -14,14 +21,14 @@ export const getAllBlogs = async (req, res, next) => {
         blogs: blogs,
       });
     }
-    const totalPages = Math.ceil(totalBlogs/limit);
+    const totalPages = Math.ceil(totalBlogs / limit);
     res.status(200).json({
       status: true,
       page,
       limit,
       totalBlogs,
       totalPages,
-      blogs
+      blogs,
     });
   } catch (err) {
     next(err);
@@ -52,22 +59,34 @@ export const getBlogById = async (req, res, next) => {
 //POST OR CREATE A BLOG
 export const createBlog = async (req, res, next) => {
   const { title, content } = req.body;
-  const image = req.file?.filename;
-  const authorId = req.user.id;
-  let status = req.user.role === "admin" ? "published" : "draft";
+
   if (!title || !content) {
     return res.status(400).json({
       status: false,
       message: "Please enter title and content",
     });
   }
+
   try {
+    let image = null;
+    let image_public_id = null;
+
+    if (req.file) {
+      const cloudinaryImage = await uploadToCloudinary(req.file.buffer);
+      image = cloudinaryImage.secure_url;
+      image_public_id = cloudinaryImage.public_id;
+    }
+
+    const authorId = req.user.id;
+    let status = req.user.role === "admin" ? "published" : "draft";
+
     const newBlog = await blogService.createBlog(
       title,
       content,
       authorId,
       image,
-      status
+      status,
+      image_public_id || "",
     );
     res.status(200).json({
       status: true,
@@ -83,19 +102,48 @@ export const createBlog = async (req, res, next) => {
 export const updateBlog = async (req, res, next) => {
   const id = req.params.id;
   const { title, content } = req.body;
-  if (!title && !content) {
+
+  if (!title && !content && !req.file) {
     return res.status(400).json({
       status: false,
-      message: "Please enter title or content",
+      message: "Please provide title, content or image",
     });
   }
+
   try {
-    let status = req.user.role === "admin" ? "published" : "draft";
-    const updateBlog = await blogService.updateBlog(id, title, content, status);
+    const blog = await blogService.getBlogByID(id);
+
+    let image = blog.image;
+    let image_public_id = blog.image_public_id;
+
+    if (req.file) {
+      // Delete old image
+      if (image_public_id) {
+        await deleteFromCloudinary(image_public_id);
+      }
+
+      // Upload new image
+      const uploadedImage = await uploadToCloudinary(req.file.buffer);
+
+      image = uploadedImage.secure_url;
+      image_public_id = uploadedImage.public_id;
+    }
+
+    const status = req.user.role === "admin" ? "published" : "draft";
+
+    const updatedBlog = await blogService.updateBlog(
+      id,
+      title,
+      content,
+      status,
+      image,
+      image_public_id,
+    );
+
     res.status(200).json({
       status: true,
       message: "Blog Updated Successfully",
-      blog: updateBlog,
+      blog: updatedBlog,
     });
   } catch (err) {
     next(err);
@@ -146,15 +194,22 @@ export const blogsByAuthor = async (req, res, next) => {
   }
 };
 
-//DELETE NOTE
+//DELETE Blog
 export const deleteBlog = async (req, res, next) => {
   const id = req.params.id;
+
   try {
-    const deleteBlog = await blogService.deleteBlog(id);
+    const blog = await blogService.getBlogByID(id);
+
+    if (blog.image_public_id) {
+      await deleteFromCloudinary(blog.image_public_id);
+    }
+
+    await blogService.deleteBlog(id);
+
     res.status(200).json({
       status: true,
       message: "Blog Deleted Successfully",
-      blog: deleteBlog,
     });
   } catch (err) {
     next(err);

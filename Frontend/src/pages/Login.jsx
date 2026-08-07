@@ -97,7 +97,7 @@ function Login() {
           <button
             disabled={loading}
             type="submit"
-            className="flex w-full justify-center rounded bg-black px-3 py-2 font-semibold text-white disabled:opacity-50"
+            className="flex w-full cursor-pointer justify-center rounded-md bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-gray-800 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>

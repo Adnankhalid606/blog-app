@@ -18,7 +18,7 @@ router.get("/me", protect, allowRoles("author", "admin"), blogsByAuthor);
 router.patch("/:id/publish", protect, allowRoles("author", "admin"), blogOwnership, publishBlog);
 router.get("/:id", getBlogById);
 router.post("/create", protect, allowRoles("author", "admin"), upload.single("image"), createBlog);
-router.put("/:id", protect, allowRoles("author", "admin"), blogOwnership, updateBlog);
+router.put("/:id", protect, allowRoles("author", "admin"), blogOwnership, upload.single("image"), updateBlog);
 router.delete("/:id", protect, allowRoles("author", "admin"), blogOwnership, deleteBlog);
 
 export default router;

@@ -91,7 +91,7 @@ function Profile() {
                 )}
                 <button
                   disabled={loading}
-                  className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+                  className="cursor-pointer rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-gray-800 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? "Sending..." : "Send application"}
                 </button>

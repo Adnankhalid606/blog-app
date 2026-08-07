@@ -41,15 +41,15 @@ function Home() {
         </p>
         <form
           onSubmit={searchBlogs}
-          className="mx-auto mt-6 flex max-w-lg gap-2"
+          className="mx-auto mt-6 flex max-w-lg items-center gap-2"
         >
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title"
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            placeholder="Search by title..."
+            className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-800 shadow-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
           />
-          <button className="rounded bg-black px-5 py-2 text-white">
+          <button className="cursor-pointer rounded-md bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-gray-800 transition-colors">
             Search
           </button>
         </form>

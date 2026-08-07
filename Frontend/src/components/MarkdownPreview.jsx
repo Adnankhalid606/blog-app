@@ -1,11 +1,10 @@
-import { renderMarkdown } from "../utils/renderMarkdown";
+import ReactMarkdown from "react-markdown";
 
 function MarkdownPreview({ content }) {
   return (
-    <div
-      className="markdown-content break-words text-gray-700"
-      dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
-    />
+    <div className="markdown-content break-words text-gray-700 prose prose-gray max-w-none">
+      <ReactMarkdown>{content || ""}</ReactMarkdown>
+    </div>
   );
 }
 

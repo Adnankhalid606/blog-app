@@ -19,8 +19,15 @@ function EditBlog() {
   }, [id]);
   const save = async (data) => {
     setSubmitting(true);
+    setError("");
     try {
-      await updateBlog(id, { title: data.title, content: data.content });
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("content", data.content);
+      if (data.image) {
+        formData.append("image", data.image);
+      }
+      await updateBlog(id, formData);
       navigate("/my-blogs");
     } catch (err) {
       setError(err.response?.data?.message || err.message);

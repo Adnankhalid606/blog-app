@@ -7,17 +7,23 @@ function Dashboard() {
       <h1 className="text-3xl font-bold">Dashboard</h1>
       <p className="mt-2 text-gray-600">Welcome back, {user?.username}.</p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Link to="/my-blogs" className="rounded border p-6 hover:bg-gray-50">
-          <h2 className="font-semibold">My blogs</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Create, edit, submit, and delete your blogs.
+        <Link
+          to="/my-blogs"
+          className="cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:border-gray-300 hover:shadow-md transition-all"
+        >
+          <h2 className="text-lg font-semibold text-gray-900">My Blogs</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Create, edit, submit, view, and delete your blogs.
           </p>
         </Link>
         {user?.role === "admin" && (
-          <Link to="/admin" className="rounded border p-6 hover:bg-gray-50">
-            <h2 className="font-semibold">Admin review</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              Review pending blogs and author requests.
+          <Link
+            to="/admin"
+            className="cursor-pointer rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:border-gray-300 hover:shadow-md transition-all"
+          >
+            <h2 className="text-lg font-semibold text-gray-900">Admin Review Panel</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Review pending blog submissions and author applications.
             </p>
           </Link>
         )}
