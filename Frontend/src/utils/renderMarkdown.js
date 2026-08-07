@@ -22,3 +22,19 @@ export function renderMarkdown(value = "") {
     )
     .replace(/\n/g, "<br />");
 }
+
+export function stripMarkdown(markdown = "") {
+  if (!markdown) return "";
+  return markdown
+    .replace(/^#+\s+/gm, "")
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+    .replace(/(\*\*|__)(.*?)\1/g, "$2")
+    .replace(/(\*|_)(.*?)\1/g, "$2")
+    .replace(/`(.*?)`/g, "$1")
+    .replace(/^\s*>+\s?/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/\n+/g, " ")
+    .trim();
+}
