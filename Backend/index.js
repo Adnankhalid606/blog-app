@@ -16,7 +16,6 @@ validateEnv();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const allowedOrigin = process.env.CLIENT_URL;
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
