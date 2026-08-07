@@ -123,6 +123,8 @@ function MyBlogs() {
                           ? "text-green-700"
                           : blog.status === "pending"
                           ? "text-amber-700"
+                          : blog.status === "rejected"
+                          ? "text-red-700 font-semibold"
                           : "text-gray-700"
                       }`}
                     >
@@ -148,13 +150,17 @@ function MyBlogs() {
                 >
                   Edit
                 </Link>
-                {blog.status === "draft" && (
+                {(blog.status === "draft" || blog.status === "rejected") && (
                   <button
                     disabled={submittingId === blog.id}
                     onClick={() => submit(blog.id)}
                     className="cursor-pointer rounded-md border border-gray-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {submittingId === blog.id ? "Submitting..." : "Submit"}
+                    {submittingId === blog.id
+                      ? "Submitting..."
+                      : blog.status === "rejected"
+                      ? "Resubmit"
+                      : "Submit"}
                   </button>
                 )}
                 <button

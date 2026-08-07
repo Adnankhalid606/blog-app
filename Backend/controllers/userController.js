@@ -82,21 +82,21 @@ export const logIn = async (req, res, next) => {
         .status(401)
         .json({ status: false, message: "Email or Password is invalid" });
     }
-    if (!user.verified) {
-      return res
-        .status(401)
-        .json({ status: false, message: "Please verify your email" });
-    }
     const checkPassword = await bcrypt.compare(password, user.password);
     if (!checkPassword) {
       return res
         .status(401)
         .json({ status: false, message: "Email or Password is invalid" });
     }
+    if (!user.verified) {
+      return res
+        .status(401)
+        .json({ status: false, message: "Please verify your email" });
+    }
     const accessToken = await generateToken(user.id, "15m");
     const refreshToken = await generateToken(user.id);
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    const session = await userServices.createSession(
+    await userServices.createSession(
       user.id,
       hashedRefreshToken,
       req.ip,
@@ -149,7 +149,7 @@ export const refreshToken = async (req, res, next) => {
       status: true,
       token: accessToken,
     });
-  } catch(err){
+  } catch (err) {
     next(err);
   }
 };
@@ -195,7 +195,6 @@ export const logoutAll = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const refreshToken = req.refreshToken;
-    // Finding/Get all sessions by user id
     const userSessions = await userServices.getSessionsByUserID(userId);
     let currentSessionId = null;
     for (const session of userSessions) {
@@ -257,6 +256,7 @@ export const resetPassword = async (req, res, next) => {
     next(err);
   }
 };
+
 export const resendVerificationEmail = async (req, res, next) => {
   const { email } = req.body;
   if (!email) {
@@ -281,6 +281,7 @@ export const resendVerificationEmail = async (req, res, next) => {
     next(err);
   }
 };
+
 export const verifyEmail = async (req, res, next) => {
   const { otp, email } = req.body;
   try {
@@ -302,7 +303,6 @@ export const verifyEmail = async (req, res, next) => {
     const accessToken = await generateToken(user.id, "15m");
     const refreshToken = await generateToken(user.id);
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    //delete otp all by user email
     await userServices.deleteOtpByEmail(email);
     const session = await userServices.createSession(
       user.id,

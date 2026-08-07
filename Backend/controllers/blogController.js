@@ -155,10 +155,10 @@ export const publishBlog = async (req, res, next) => {
   try {
     const id = req.params.id;
     const blog = req.blog;
-    if (blog.status !== "draft") {
+    if (!["draft", "rejected"].includes(blog.status)) {
       return res.status(400).json({
         status: false,
-        message: "Blog is not in Draft",
+        message: "Blog cannot be submitted for approval in its current status",
       });
     }
 

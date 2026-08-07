@@ -93,7 +93,7 @@ function Admin() {
               </div>
               <span className="flex items-center gap-2">
                 <Link
-                  to={`/blogs/${blog.id}`}
+                  to={`/admin/blogs/${blog.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cursor-pointer rounded-md border border-gray-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"

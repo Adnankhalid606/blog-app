@@ -1,5 +1,32 @@
 import db from "../config/dbConnection.js";
-export const getAllPendingBlogs = async () => { const [rows] = await db.query("SELECT blogs.*, users.username AS author_name FROM blogs JOIN users ON users.id = blogs.author_id WHERE blogs.status = 'pending'"); return rows; };
-export const getPendingBlogById = async (id) => { const [rows] = await db.query("SELECT blogs.*, users.username AS author_name FROM blogs JOIN users ON users.id = blogs.author_id WHERE blogs.id = ? AND blogs.status = 'pending'", [id]); return rows[0]; };
-export const blogApproveById = async (id) => { const [result] = await db.query("UPDATE blogs SET status = 'published' WHERE id = ? AND status = 'pending'", [id]); return result.affectedRows; };
-export const blogRejectById = async (id) => { const [result] = await db.query("UPDATE blogs SET status = 'rejected' WHERE id = ? AND status = 'pending'", [id]); return result.affectedRows; };
+
+export const getAllPendingBlogs = async () => {
+  const [rows] = await db.query(
+    "SELECT blogs.*, users.username AS author_name FROM blogs JOIN users ON users.id = blogs.author_id WHERE blogs.status = 'pending'",
+  );
+  return rows;
+};
+
+export const getPendingBlogById = async (id) => {
+  const [rows] = await db.query(
+    "SELECT blogs.*, users.username AS author_name FROM blogs JOIN users ON users.id = blogs.author_id WHERE blogs.id = ?",
+    [id],
+  );
+  return rows[0];
+};
+
+export const blogApproveById = async (id) => {
+  const [result] = await db.query(
+    "UPDATE blogs SET status = 'published' WHERE id = ? AND status = 'pending'",
+    [id],
+  );
+  return result.affectedRows;
+};
+
+export const blogRejectById = async (id) => {
+  const [result] = await db.query(
+    "UPDATE blogs SET status = 'rejected' WHERE id = ? AND status = 'pending'",
+    [id],
+  );
+  return result.affectedRows;
+};

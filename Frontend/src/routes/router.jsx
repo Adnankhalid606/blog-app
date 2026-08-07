@@ -12,6 +12,7 @@ import CreateBlog from "../pages/CreateBlog";
 import EditBlog from "../pages/EditBlog";
 import MyBlogs from "../pages/MyBlogs";
 import Admin from "../pages/Admin";
+import AdminBlogPreview from "../pages/AdminBlogPreview";
 import ProtectedRoute from "../components/ProtectedRoute";
 import GuestRoute from "../components/GuestRoute";
 const protectedPage = (page, roles) => (
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
         element: protectedPage(<EditBlog />, ["author", "admin"]),
       },
       { path: "admin", element: protectedPage(<Admin />, ["admin"]) },
+      {
+        path: "admin/blogs/:id",
+        element: protectedPage(<AdminBlogPreview />, ["admin"]),
+      },
     ],
   },
 ]);
